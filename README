@@ -1,0 +1,49 @@
+#+TITLE: The =CL-STRING-COMPLETE= String Completion Library
+#+AUTHOR: Robert Smith
+#+EMAIL: quad@symbo1ics.com
+
+* Summary
+A small library for string completion by Robert Smith.
+
+* Usage
+The principle use follows.
+
+Create a completion tree:
+
+    : > (defparameter *tree* (make-completion-tree))
+
+Add your words to it:
+
+    : > (completion-tree-add *tree* "hello")
+    : > (completion-tree-add* *tree* "helmet"
+    :                                "help"
+    :                                "helsinki")
+
+Check if something exists in the tree:
+
+    : > (completion-tree-contains-p *tree* "hello"
+    : T
+    : > (completion-tree-contains-p *tree* "hexagon"
+    : NIL
+
+Compute the completions of a character:
+
+    : > (compute-completions *tree* #\h)
+    : ("ello" "elmet" "elp" "elsinki")
+    : > (compute-completions *tree* #\x)
+    : NIL
+
+Compute the completions of a string:
+
+    : > (compute-completions *tree* "hel")
+    : ("lo" "met" "sinki" "p")
+
+* Dependencies
+The =QTILITY= utility package, located at
+<https://bitbucket.org/tarballs_are_good/qtility>.
+
+* License
+See the file ~LICENSE~.
+
+----------
+### End of file
