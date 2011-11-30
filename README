@@ -21,9 +21,9 @@ Add your words to it:
 
 Check if something exists in the tree:
 
-    : > (completion-tree-contains-p *tree* "hello"
+    : > (completion-tree-contains-p *tree* "hello")
     : T
-    : > (completion-tree-contains-p *tree* "hexagon"
+    : > (completion-tree-contains-p *tree* "hexagon")
     : NIL
 
 Compute the completions of a character:
