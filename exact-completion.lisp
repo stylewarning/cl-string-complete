@@ -99,6 +99,7 @@ balance the tree."
                      :finally (return vector))))
            
            (shuffle (list)
+             "Shuffle the list LIST randomly."
              (let ((vec (make-array (length list) :initial-contents list)))
                (concatenate 'list (nshuffle-vector vec)))))
     (dolist (s (shuffle strings) tree)
