@@ -39,8 +39,7 @@ Compute the completions of a string:
     : ("lo" "met" "sinki" "p")
 
 * Dependencies
-The =QTILITY= utility package, located at
-<https://bitbucket.org/tarballs_are_good/qtility>.
+None.
 
 * License
 See the file ~LICENSE~.

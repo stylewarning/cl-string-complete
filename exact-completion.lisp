@@ -80,7 +80,28 @@
 (defun completion-tree-add* (tree &rest strings)
   "Add a list of strings to TREE. The strings are suffled to help
 balance the tree."
-  (dolist (s (qtl:shuffle strings) tree)
+  ;; These functions are pilfered from QTILITY.
+  (labels ((random-between (a b)
+             "Generate a random integer between A and B, inclusive."
+             (assert (>= b a))
+             (if (= a b)
+                 a
+                 (+ a (random (- (1+ b) a)))))
+           
+           (nshuffle-vector (vector)
+             "Destructively shuffle VECTOR randomly."
+             (let ((n (length vector)))
+               (loop :for i :below n 
+                     :for r := (random-between i (1- n))
+                     :when (/= i r)
+                     :do (rotatef (aref vector i)
+                                  (aref vector r))
+                     :finally (return vector))))
+           
+           (shuffle (list)
+             (let ((vec (make-array (length list) :initial-contents list)))
+               (concatenate 'list (nshuffle-vector vec))))))
+  (dolist (s (shuffle strings) tree)
     (completion-tree-add tree s)))
 
 (defun completion-tree-contains-p (tree str)
@@ -152,7 +173,7 @@ balance the tree."
                                (cdr item)))))
 
 (defmethod completion-node-travel ((node completion-node) (item string))
-  (completion-node-travel node (qtl:explode item)))
+  (completion-node-travel node (concatenate 'list item)))
 
 ;;;;;;;;;;;;;;;;;;;;;;; Completion computation ;;;;;;;;;;;;;;;;;;;;;;;
 

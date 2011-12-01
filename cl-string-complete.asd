@@ -14,7 +14,4 @@
 
   :serial t
   :components ((:file "package")
-               (:file "exact-completion"))
-
-  ;; Dependencies
-  :depends-on (:qtility))
+               (:file "exact-completion")))
