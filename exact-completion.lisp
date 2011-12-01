@@ -100,9 +100,9 @@ balance the tree."
            
            (shuffle (list)
              (let ((vec (make-array (length list) :initial-contents list)))
-               (concatenate 'list (nshuffle-vector vec))))))
-  (dolist (s (shuffle strings) tree)
-    (completion-tree-add tree s)))
+               (concatenate 'list (nshuffle-vector vec)))))
+    (dolist (s (shuffle strings) tree)
+      (completion-tree-add tree s))))
 
 (defun completion-tree-contains-p (tree str)
   "Check if TREE contains the word STR."
