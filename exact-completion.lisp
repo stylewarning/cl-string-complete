@@ -5,6 +5,8 @@
 
 (in-package #:cl-string-complete)
 
+(declaim (optimize speed (safety 0) (debug 0)))
+
 ;;;;;;;;;;;;;;;;;;;;;; Completion node datatype ;;;;;;;;;;;;;;;;;;;;;;
 
 (defstruct (completion-node (:conc-name completion-node.)
@@ -128,31 +130,32 @@ balance the tree."
 
 (defun completion-node-completions (node)
   "Walk the children of NODE to find all completions."
-  (labels ((stringify-cat (x y)
-             (concatenate 'string
-                          (string x)
-                          (string y)))
-           
-           ;; Heavily non-tail recursive. Can we simplify?
-           (compute-node-completions (node prefix)
-             (when node
-               (let* ((cstr   (string (completion-node.char node)))
-                      (end?   (completion-node.endp node))
-                      (left   (completion-node.left node))
-                      (middle (completion-node.middle node))
-                      (right  (completion-node.right node)))
-                 
-                 (append (and end? (list (stringify-cat prefix cstr)))
-                         (compute-node-completions middle (stringify-cat prefix cstr))
-                         (compute-node-completions left prefix)
-                         (compute-node-completions right prefix))))))
-    (compute-node-completions node "")))
+  (let ((completion-list nil))
+    (labels ((compute-node-completions (node prefix)
+               (when node
+                 (let* ((cstr (string (completion-node.char node)))
+                        (prefix+cstr (concatenate 'string prefix cstr)))
+                   (when (completion-node.endp node)
+                     (push prefix+cstr completion-list))
+                   
+                   (compute-node-completions (completion-node.left node)
+                                             prefix)
+                   (compute-node-completions (completion-node.middle node)
+                                             prefix+cstr)
+                   (compute-node-completions (completion-node.right node)
+                                             prefix)))))
+      (compute-node-completions node "")
+      
+      (nreverse completion-list))))
 
 ;;;;;;;;;;;;;;;;;; Traveling along completion nodes ;;;;;;;;;;;;;;;;;;
 
 (defgeneric completion-node-travel (node item)
   (:documentation "Travel to the next node from NODE along the
   branch(es) specified by ITEM."))
+
+(defmethod completion-node-travel ((node null) item)
+  nil)
 
 (defmethod completion-node-travel ((node completion-node) (item character))
   (cond
