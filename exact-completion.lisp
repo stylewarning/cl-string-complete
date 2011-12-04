@@ -184,16 +184,22 @@ balance the tree."
 
 ;;;;;;;;;;;;;;;;;;;;;;; Completion computation ;;;;;;;;;;;;;;;;;;;;;;;
 
-(defgeneric compute-completions (node item &key limit)
+(defgeneric compute-completions (node item &key limit prefixedp)
   (:documentation "Compute the completions of of ITEM given a node or
-  tree NODE-OR-TREE."))
+  tree NODE. If an integer limit LIMIT is given, then only a maximum
+  of LIMIT completions will be given. If PREFIXEDP is true, then the
+  completions will include the prefix."))
 
-(defmethod compute-completions ((node completion-node) item &key limit)
+(defmethod compute-completions ((node completion-node) item &key limit
+                                                                 prefixedp)
   (completion-node-completions (completion-node-travel node item)
-                               :limit limit))
+                               :limit limit
+                               :prefix (and prefixedp (string item))))
 
-(defmethod compute-completions ((tree completion-tree) item &key limit)
+(defmethod compute-completions ((tree completion-tree) item &key limit
+                                                                 prefixedp)
   (completion-node-completions
    (completion-node-travel (completion-tree.root tree) item)
-   :limit limit))
+   :limit limit
+   :prefix (and prefixedp (string item))))
 
