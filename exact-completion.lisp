@@ -128,15 +128,18 @@ balance the tree."
   
   nil)                                  ; Return NIL otherwise...
 
-(defun completion-node-completions (node)
+(defun completion-node-completions (node &key (prefix "")
+                                              limit)
   "Walk the children of NODE to find all completions."
-  (let ((completion-list nil))
+  (let ((completion-list nil)
+        (completion-count 0))
     (labels ((compute-node-completions (node prefix)
-               (when node
+               (when (and node (not (eql limit completion-count)))
                  (let* ((cstr (string (completion-node.char node)))
                         (prefix+cstr (concatenate 'string prefix cstr)))
                    (when (completion-node.endp node)
-                     (push prefix+cstr completion-list))
+                     (push prefix+cstr completion-list)
+                     (incf completion-count))
                    
                    (compute-node-completions (completion-node.left node)
                                              prefix)
@@ -144,7 +147,7 @@ balance the tree."
                                              prefix+cstr)
                    (compute-node-completions (completion-node.right node)
                                              prefix)))))
-      (compute-node-completions node "")
+      (compute-node-completions node prefix)
       
       (nreverse completion-list))))
 
@@ -181,14 +184,16 @@ balance the tree."
 
 ;;;;;;;;;;;;;;;;;;;;;;; Completion computation ;;;;;;;;;;;;;;;;;;;;;;;
 
-(defgeneric compute-completions (node-or-tree item)
+(defgeneric compute-completions (node item &key limit)
   (:documentation "Compute the completions of of ITEM given a node or
   tree NODE-OR-TREE."))
 
-(defmethod compute-completions ((node completion-node) item)
-  (completion-node-completions (completion-node-travel node item)))
+(defmethod compute-completions ((node completion-node) item &key limit)
+  (completion-node-completions (completion-node-travel node item)
+                               :limit limit))
 
-(defmethod compute-completions ((tree completion-tree) item)
+(defmethod compute-completions ((tree completion-tree) item &key limit)
   (completion-node-completions
-   (completion-node-travel (completion-tree.root tree) item)))
+   (completion-node-travel (completion-tree.root tree) item)
+   :limit limit))
 
